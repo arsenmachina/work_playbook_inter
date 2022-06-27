@@ -25,6 +25,7 @@
       remote_src: yes
     become: true
     become_method: sudo
+    when:  check.files[item].path | basename == "k8s"
     loop: "{{ range(check.files | length) | list }}"
   
 
