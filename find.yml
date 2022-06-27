@@ -1,0 +1,30 @@
+---
+- name: find 
+  hosts: all
+  become: yes 
+  gather_facts: yes
+  vars: 
+    username_src: "test"
+    username_dest: "docker"
+  tasks:
+  - name: find 
+    find:
+      paths: '/home/{{username_src}}/'
+      patterns: "*"
+      file_type: any
+      hidden: no
+    register: check
+
+  - name: move work files
+    copy:
+      src: /home/{{username_src}}/{{ check.files[item].path  | basename }}
+      dest: /home/{{username_dest}}/
+      owner: "{{username_dest}}"
+      group: "{{username_dest}}"
+      mode: '0755'
+      remote_src: yes
+    become: true
+    become_method: sudo
+    loop: "{{ range(check.files | length) | list }}"
+  
+
